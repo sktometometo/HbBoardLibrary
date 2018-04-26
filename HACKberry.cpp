@@ -210,29 +210,33 @@ void HACKberry::readSensor() {
     this->SensorValue = (this->Sensor).read();
 }
 
+void HACKberry::calcControlInput() {
+    this->ControlInput = this->SensorValue;
+}
+
 void HACKberry::calcPosition() {
 
     // Calc Speed
-    int NormalizedSensorValue = map(this->SensorValue, this->MinSensorValue, this->MaxSensorValue, this->NormalizedSensorMin, this->NormalizedSensorMax);
+    int NormalizedSensorValue = map(this->ControlInput, this->MinSensorValue, this->MaxSensorValue, this->NormalizedSensorMin, this->NormalizedSensorMax);
     if ( NormalizedSensorValue > this->SensorRangeSaturation ) {
-        this->angle_speed = MaxForwardSpeed
+        this->CurrentAngularVelocity = MaxForwardSpeed
     } else if ( NormalizedSensorValue > this->MaxSensorRangeStop ) { // Forward
-        this->angle_speed = map(NormalizedSensorValue, this->MaxSensorRangeStop, this->NormalizedSensorMax, MinForwardSpeed, MaxForwardSpeed);
+        this->CurrentAngularVelocity = map(NormalizedSensorValue, this->MaxSensorRangeStop, this->NormalizedSensorMax, MinForwardSpeed, MaxForwardSpeed);
     } else if ( NormalizedSensorValue > this->MinSensorRangeStop ) { // Stop
-        this->angle_speed = MinForwardSpeed;
+        this->CurrentAngularVelocity = MinForwardSpeed;
     } else { // Reverse
-        this->angle_speed = map(NormalizedSensorValue, this->NormalizedSensorMin, this->MinSensorRangeStop, ManReverseSpeed, MinReverseSpeed);
+        this->CurrentAngularVelocity = map(NormalizedSensorValue, this->NormalizedSensorMin, this->MinSensorRangeStop, ManReverseSpeed, MinReverseSpeed);
     }
 
     // Calc Target Position
-    this->angle_position = this->preangle_position + this->angle_speed;
-    if ( this->angle_position > this->NormalizedAngleMaxPosition ) {
-        this->angle_position = this->NormalizedAngleMaxPosition;
+    this->CurrentAngle = this->PreAngle + this->CurrentAngularVelocity;
+    if ( this->CurrentAngle > this->NormalizedAngleMaxPosition ) {
+        this->CurrentAngle = this->NormalizedAngleMaxPosition;
     }
-    if ( this->angle_position < this->NormalizedAngleMinPosition ) {
-        this->angle_position = this->NormalizedAngleMinPosition;
+    if ( this->CurrentAngle < this->NormalizedAngleMinPosition ) {
+        this->CurrentAngle = this->NormalizedAngleMinPosition;
     }
-    this->preangle_position = this->angle_position;
+    this->PreAngle = this->CurrentAngle;
 }
 
 void HACKberry::controlServo() {
@@ -264,11 +268,35 @@ void HACKberry::calibration( unsigned long calibtime = 5000 ) {
         }
 
         calcPosition();
-        this->TargetAngleIndex = map(this->angle_position,
+        this->TargetAngleIndex = map(this->CurrentAngle,
                                     this->NormalizedAngleMinPosition, this->NormalizedAngleMaxPosition,
                                     this->AngleIndexClose, this->AngleIndexOpen);
         (this->controlServo)();
 
         delay(PERIOD_CONTROL_IN_MILISEC);
+    }
+}
+
+void HACKberry::initLog() {
+    this->isLogValid = true;
+    Serial.begin(9600);
+}
+
+void HACKberry::outputLog() {
+    if ( this->isLogValid ) {
+        Serial.print("== LOG ==");
+        Serial.print("=== Sensor ===");
+        Serial.print("  "); Serial.print("Cur Sensor Val ="); Serial.print(this->SensorValue);
+        Serial.print("  "); Serial.print("Min Sensor Val ="); Serial.print(this->MinSensorValue);
+        Serial.print("  "); Serial.print("Max Sensor Val ="); Serial.print(this->MaxSensorValue);
+        Serial.print("=== Status ===");
+        Serial.print("  "); Serial.print("Current Ang ="); Serial.print(this->CurrentAngle);
+        Serial.print("  "); Serial.print("Cuurent Vel ="); Serial.print(this->CurrentAngularVelocity);
+        Serial.print("  "); Serial.print("Target Ang (Index)="); Serial.print(this->TargetAngleIndex);
+        Serial.print("  "); Serial.print("Target Ang (Middle)="); Serial.print(this->TargetAngleMiddle);
+        Serial.print("  "); Serial.print("Target Ang (Thumb)="); Serial.print(this->TargetAngleThumb);
+        Serial.print("  "); Serial.print("Flag Thumb Open="); Serial.print(this->isThumbOpen);
+        Serial.print("  "); Serial.print("Flag Other Lock="); Serial.print(this->isOtherLock);
+    } else {
     }
 }

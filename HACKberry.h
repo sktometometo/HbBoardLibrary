@@ -40,13 +40,26 @@ public:
     // TBI: init them in init();
     boolean isThumbOpen=true;
     boolean isOtherLock=false;
-    int SensorValue;
-    int angle_position;
-    int angle_speed;
-    int preangle_position;
+    boolean isLogValid=false;
+
+    // status variables
+    int ControlInput;
+    int CurrentAngle;
+    int CurrentAngularVelocity;
+    int PreAngle;
+    int PreAngularVelocity; // Not In Use
     int TargetAngleThumb;
     int TargetAngleIndex;
     int TargetAngleOther;
+    int TargetAngularVelocityThumb; // Not In Use
+    int TargetAngularVelocityIndex; // Not In Use
+    int TargetAngularVelocityOther; // Not In Use
+
+    //
+    int BLEStateVal;
+
+    // for Sensor
+    int SensorValue;
 
     // constatnt
     const int NormalizedAngleMaxPosition = 100;
@@ -89,7 +102,7 @@ public:
     void (*ThumbCB)();
     void (*OtherCB)();
 
-// functions
+    // functions
     HACKberry();
     HACKberry(BoardType);
 

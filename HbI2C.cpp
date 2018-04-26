@@ -3,6 +3,7 @@
 #include "Wire.h"
 
 extern int HbSensorVal;
+int BLEStateVal;
 
 // I2C Buffer
 uint8_t bufrx[I2C_BUFSIZE];
@@ -11,8 +12,6 @@ uint8_t buftx[I2C_BUFSIZE];
 // cmd and state
 int cmd; // if -1, received data is cmd;
 
-// state value
-int BLEStateVal;
 
 void requestEvent() {
     if (cmd == -1) {

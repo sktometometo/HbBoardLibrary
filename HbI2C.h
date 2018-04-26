@@ -19,4 +19,15 @@ void HbI2C_transceiveBattery();
 void HbI2C_receiveSensor(int);
 void HbI2C_receiveBLEState(int);
 
+typedef enum {
+    connected,
+    disconnected
+} BLEState;
+
+typedef enum {
+    hoge,
+    fuga,
+    hogefuga
+} HandState;
+
 #endif
