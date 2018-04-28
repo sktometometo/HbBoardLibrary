@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "Wire.h"
+#include "HbI2C.h"
 
 extern int HbSensorVal;
 int BLEStateVal;
@@ -31,12 +32,12 @@ void requestEvent() {
 }
 
 void receiveEvent() {
-    for (int i=0; i<I2C_BUFSIZE || Wire.avilable(); i++) {
+    for (int i=0; i<I2C_BUFSIZE || Wire.available(); i++) {
         bufrx[i] = Wire.read();
     }
 
     if (cmd == -1) {
-        cmd = (bufcmd[0] << 8) + bufcmd[1];
+        cmd = (bufrx[0] << 8) + bufrx[1];
     } else {
         switch (cmd) {
             case I2C_CMD_SEND_SENSOR:
@@ -53,7 +54,7 @@ void receiveEvent() {
 void HbI2C_transceiveState(uint8_t val) {
     // TBD
     // TODO: bufdataを1バイトでつくる
-    buftx[0] = val
+    buftx[0] = val;
     Wire.write(buftx, 1);
 }
 

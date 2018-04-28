@@ -18,7 +18,8 @@ typedef enum {
     SizeSRight,
     SizeSLeft,
     SizeMRight,
-    SizeMLeft
+    SizeMLeft,
+    Mk2RightBLE
 } BoardType;
 
 class HACKberry {
@@ -36,11 +37,15 @@ public:
     Servo     ServoOther;
     Servo     ServoThumb;
 
+    // Serial Number
+    String serialNum = "HACKberry";
+
     // Status
     // TBI: init them in init();
     boolean isThumbOpen=true;
     boolean isOtherLock=false;
     boolean isLogValid=false;
+    boolean isSensorReversed=false;
 
     // status variables
     int ControlInput;
@@ -76,10 +81,10 @@ public:
 
     // Parameters for Servo Control
     // MinReverseSpeed < MaxReverseSpeed < MinForwardSpeed < MaxForwardSpeed
-    int MaxForwardSpeed;
-    int MinForwardSpeed;
-    int MaxReverseSpeed;
-    int MinReverseSpeed;
+    int MaxOpenSpeed;
+    int MinOpenSpeed;
+    int MaxCloseSpeed;
+    int MinCloseSpeed;
 
     int AngleThumbMin;
     int AngleThumbMax;
@@ -106,12 +111,14 @@ public:
     HACKberry();
     HACKberry(BoardType);
 
+    void setSerialNum(char*);
+    void setSerialNum(String);
     void setBoardType(BoardType);
     void setAngleIndex(int , int );
     void setAngleOther(int , int );
     void setAngleThumb(int , int );
     void setSpeedRange(int , int , int , int );
-    void setSensorThreshold(int , int );
+    void setSensorThreshold(int , int , int);
 
     // Not In Use
     void setCalibCallBack(void (*)(void*));
@@ -121,9 +128,15 @@ public:
 
     void init();
     void readSensor();
+    void calcControlInput();
     void calcPosition();
     void controlServo();
     void calibration(unsigned long);
 
+    void initLog();
+
 };
+
+void outputLog(HACKberry *);
+
 #endif

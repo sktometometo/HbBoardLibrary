@@ -4,104 +4,42 @@
 HbButton::HbButton() {
 }
 
-HbButton::HbButton(int pin, boolean isDigital, boolean isPullup)
-{
-    this->pin = pin;
-    this->isDigital = isDigital;
-    this->isPullup = isPullup;
-
-    if (isDigital) {
-        if (isPullup) {
-            pinMode(pin, INPUT_PULLUP);
-        } else {
-            pinMode(pin, INPUT);
-        }
-    } else {
-    }
-}
-
 HbButton::HbButton(int pin)
 {
     this->pin = pin;
-    this->isDigital = true;
-    this->isPullup = true;
-
-    if (isDigital) {
-        if (isPullup) {
-            pinMode(pin, INPUT_PULLUP);
-        } else {
-            pinMode(pin, INPUT);
-        }
-    } else {
-
-    }
-}
-
-void HbButton::setPin(int pin)
-{
-    this->pin = pin;
-}
-
-void HbButton::setMode(boolean isDigital, boolean isPullup)
-{
-    this->isDigital = isDigital;
-    this->isPullup = isPullup;
-}
-
-void HbButton::setMode(boolean isDigital)
-{
-    this->isDigital = isDigital;
+    this->init();
 }
 
 void HbButton::init()
 {
-    if (this->isDigital) {
-        if (this->isPullup) {
-            pinMode(this->pin, INPUT_PULLUP);
-        } else {
-            pinMode(this->pin, INPUT);
-        }
-    } else {
-    }
-}
-
-void HbButton::attach(int pin, boolean isDigital, boolean isPullup)
-{
-    (this->setPin)(pin);
-    (this->setMode)(isDigital, isPullup);
-    (this->init)();
+    pinMode( this->pin, INPUT_PULLUP);
 }
 
 void HbButton::attach(int pin)
 {
-    (this->attach)(pin, true, true);
+    this->pin = pin;
+    pinMode( this->pin, INPUT_PULLUP);
 }
 
 boolean HbButton::read()
 {
     int count = 0;
     int time_delay = HBBUTTON_TIME_READ_IN_USEC / HBBUTTON_MAX_COUNT;
-    if (isDigital) {
-        for(int i; i<HBBUTTON_MAX_COUNT; i++) {
-            if (digitalRead(this->pin) == HIGH) count++;
-            delayMicroseconds(time_delay);
-        }
-    } else {
-        for(int i; i<HBBUTTON_MAX_COUNT; i++) {
-            if (analogRead(this->pin) > 512) count++;
-            delayMicroseconds(time_delay);
-        }
-    }
 
-    if (count == HBBUTTON_MAX_COUNT) return HIGH;
-    else return LOW;
+    for (int i=0; i<HBBUTTON_MAX_COUNT; i++) {
+        if ( this->readraw() == LOW ) count++;
+        delayMicroseconds(time_delay);
+    }
+    
+    if (count == HBBUTTON_MAX_COUNT) return LOW;
+    else return HIGH;
 }
 
 boolean HbButton::readraw()
 {
-    if (isDigital) {
-        return digitalRead(this->pin);
-    } else {
+    if ( digitalPinToPort(pin) == NOT_A_PIN ) {
         return analogRead(this->pin) > 512 ? HIGH : LOW;
+    } else {
+        return digitalRead(this->pin);
     }
 }

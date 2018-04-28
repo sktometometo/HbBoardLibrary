@@ -3,6 +3,7 @@
 
 #include "Arduino.h"
 #include "HbI2C.h"
+#include "HbSensor.h"
 
 int HbSensorVal;
 

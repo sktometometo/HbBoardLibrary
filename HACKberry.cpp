@@ -13,6 +13,10 @@ void HACKberry::setBoardType(BoardType board) {
     this->board = board;
 }
 
+void HACKberry::setSerialNum(char* sn) {
+    this->serialNum = sn;
+}
+
 void HACKberry::setAngleIndex(int MinAngle, int MaxAngle) {
     this->AngleIndexMin = MinAngle;
     this->AngleIndexMax = MaxAngle;
@@ -28,11 +32,11 @@ void HACKberry::setAngleThumb(int MinAngle, int MaxAngle) {
     this->AngleThumbMax = MaxAngle;
 }
 
-void HACKberry::setSpeedRange(int MaxReverseSpeed, int MinReverseSpeed, int MinForwardSpeed, int MaxForwardSpeed ) {
-    this->MaxForwardSpeed = MaxForwardSpeed;
-    this->MinForwardSpeed = MinForwardSpeed;
-    this->MaxReverseSpeed = MaxReverseSpeed;
-    this->MinReverseSpeed = MinReverseSpeed;
+void HACKberry::setSpeedRange(int MaxOpenSpeed, int MinOpenSpeed, int MinCloseSpeed, int MaxCloseSpeed ) {
+    this->MaxOpenSpeed  = MaxOpenSpeed;
+    this->MinOpenSpeed  = MinOpenSpeed;
+    this->MaxCloseSpeed = MaxCloseSpeed;
+    this->MinCloseSpeed = MinCloseSpeed;
 }
 
 // set Range of Sensor Value For Zero speed (0~100)
@@ -63,10 +67,10 @@ void HACKberry::init() {
     switch (board) {
         case Mk1Right:
 
-            this->ButtonCalib.attach(A6,true,true);
-            this->ButtonExtra.attach(A5,true,true);
-            this->ButtonThumb.attach(A4,true,true);
-            this->ButtonOther.attach(A3,true,true);
+            this->ButtonCalib.attach(A6);
+            this->ButtonExtra.attach(A5);
+            this->ButtonThumb.attach(A4);
+            this->ButtonOther.attach(A3);
 
             this->ServoIndex.attach(3);
             this->ServoOther.attach(5);
@@ -82,14 +86,15 @@ void HACKberry::init() {
             this->AngleIndexClose = this->AngleIndexMin;
             this->AngleOtherOpen  = this->AngleOtherMax;
             this->AngleOtherClose = this->AngleOtherMin;
+            
             break;
 
         case Mk1Left:
 
-            this->ButtonCalib.attach(11,true,true);
-            this->ButtonExtra.attach(10,true,true);
-            this->ButtonThumb.attach(8,true,true);
-            this->ButtonOther.attach(7,true,true);
+            this->ButtonCalib.attach(11);
+            this->ButtonExtra.attach(10);
+            this->ButtonThumb.attach(8);
+            this->ButtonOther.attach(7);
 
             this->ServoIndex.attach(3);
             this->ServoOther.attach(5);
@@ -105,14 +110,15 @@ void HACKberry::init() {
             this->AngleIndexClose = this->AngleIndexMax;
             this->AngleOtherOpen  = this->AngleOtherMin;
             this->AngleOtherClose = this->AngleOtherMax;
+
             break;
 
         case Mk2Right:
 
-            this->ButtonCalib.attach(A6,false,true);
-            this->ButtonExtra.attach(A7,false,true);
-            this->ButtonThumb.attach(A0,false,true);
-            this->ButtonOther.attach(10,true,true);
+            this->ButtonCalib.attach(A6);
+            this->ButtonExtra.attach(A7);
+            this->ButtonThumb.attach(A0);
+            this->ButtonOther.attach(10);
 
             this->ServoIndex.attach(5);
             this->ServoOther.attach(6);
@@ -128,14 +134,15 @@ void HACKberry::init() {
             this->AngleIndexClose = this->AngleIndexMin;
             this->AngleOtherOpen  = this->AngleOtherMax;
             this->AngleOtherClose = this->AngleOtherMin;
+
             break;
 
         case Mk2Left:
 
-            this->ButtonCalib.attach(A6,false,true);
-            this->ButtonExtra.attach(A7,false,true);
-            this->ButtonThumb.attach(A0,false,true);
-            this->ButtonOther.attach(10,true,true);
+            this->ButtonCalib.attach(A6);
+            this->ButtonExtra.attach(A7);
+            this->ButtonThumb.attach(A0);
+            this->ButtonOther.attach(10);
 
             this->ServoIndex.attach(5);
             this->ServoOther.attach(6);
@@ -151,6 +158,7 @@ void HACKberry::init() {
             this->AngleIndexClose = this->AngleIndexMax;
             this->AngleOtherOpen  = this->AngleOtherMin;
             this->AngleOtherClose = this->AngleOtherMax;
+
             break;
 
         case SizeSRight:
@@ -158,10 +166,10 @@ void HACKberry::init() {
 
         case SizeSLeft:
 
-            this->ButtonCalib.attach( 1, true, true);
-            this->ButtonExtra.attach( 2, true, true);
-            this->ButtonThumb.attach( 3, true, true);
-            this->ButtonOther.attach( 0, true, true);
+            this->ButtonCalib.attach( 1);
+            this->ButtonExtra.attach( 2);
+            this->ButtonThumb.attach( 3);
+            this->ButtonOther.attach( 0);
 
             this->ServoIndex.attach(9);
             this->ServoOther.attach(6);
@@ -177,14 +185,15 @@ void HACKberry::init() {
             this->AngleIndexClose = this->AngleIndexMax;
             this->AngleOtherOpen  = this->AngleOtherMin;
             this->AngleOtherClose = this->AngleOtherMax;
+
             break;
 
         case Mk2RightBLE:
 
-            this->ButtonCalib.attach(A6,false,true);
-            this->ButtonExtra.attach(A7,false,true);
-            this->ButtonThumb.attach(A0,false,true);
-            this->ButtonOther.attach(10,true,true);
+            this->ButtonCalib.attach(A6);
+            this->ButtonExtra.attach(A7);
+            this->ButtonThumb.attach(A0);
+            this->ButtonOther.attach(10);
 
             this->ServoIndex.attach(5);
             this->ServoOther.attach(6);
@@ -199,6 +208,7 @@ void HACKberry::init() {
             this->AngleIndexClose = this->AngleIndexMin;
             this->AngleOtherOpen  = this->AngleOtherMax;
             this->AngleOtherClose = this->AngleOtherMin;
+
             break;
 
         default:
@@ -217,15 +227,20 @@ void HACKberry::calcControlInput() {
 void HACKberry::calcPosition() {
 
     // Calc Speed
-    int NormalizedSensorValue = map(this->ControlInput, this->MinSensorValue, this->MaxSensorValue, this->NormalizedSensorMin, this->NormalizedSensorMax);
+    int NormalizedSensorValue = 0;
+    if ( this->isSensorReversed ) {
+        NormalizedSensorValue = map(this->SensorValue, this->MinSensorValue, this->MaxSensorValue, this->NormalizedSensorMin, this->NormalizedSensorMax); 
+    } else {
+        NormalizedSensorValue = map(this->SensorValue, this->MinSensorValue, this->MaxSensorValue, this->NormalizedSensorMax, this->NormalizedSensorMin); 
+    }
     if ( NormalizedSensorValue > this->SensorRangeSaturation ) {
-        this->CurrentAngularVelocity = MaxForwardSpeed
+        this->CurrentAngularVelocity = MaxCloseSpeed;
     } else if ( NormalizedSensorValue > this->MaxSensorRangeStop ) { // Forward
-        this->CurrentAngularVelocity = map(NormalizedSensorValue, this->MaxSensorRangeStop, this->NormalizedSensorMax, MinForwardSpeed, MaxForwardSpeed);
+        this->CurrentAngularVelocity = map(NormalizedSensorValue, this->MaxSensorRangeStop, this->NormalizedSensorMax, MinCloseSpeed, MaxCloseSpeed);
     } else if ( NormalizedSensorValue > this->MinSensorRangeStop ) { // Stop
-        this->CurrentAngularVelocity = MinForwardSpeed;
+        this->CurrentAngularVelocity = MinCloseSpeed;
     } else { // Reverse
-        this->CurrentAngularVelocity = map(NormalizedSensorValue, this->NormalizedSensorMin, this->MinSensorRangeStop, ManReverseSpeed, MinReverseSpeed);
+        this->CurrentAngularVelocity = map(NormalizedSensorValue, this->NormalizedSensorMin, this->MinSensorRangeStop, MaxOpenSpeed, MinOpenSpeed);
     }
 
     // Calc Target Position
@@ -252,15 +267,18 @@ void HACKberry::calibration( unsigned long calibtime = 5000 ) {
     this->TargetAngleIndex = this->AngleIndexOpen;
     this->TargetAngleOther = this->AngleOtherClose;
     this->TargetAngleThumb = this->AngleThumbOpen;
-    (this->controlServo)();
+    (this->controlServo)();    
+    delay(500);
 
     //
-    this->readSensor();
+    (this->readSensor)();
+    (this->calcControlInput)();
     this->MinSensorValue = this->SensorValue;
     this->MaxSensorValue = this->SensorValue;
     unsigned long time = millis();
     while( millis() < time + calibtime ) {
         this->readSensor();
+        this->calcControlInput();
         if ( this->SensorValue < this->MinSensorValue ) {
             this->MinSensorValue = this->SensorValue;
         } else if ( this->SensorValue > this->MaxSensorValue ) {
@@ -270,9 +288,12 @@ void HACKberry::calibration( unsigned long calibtime = 5000 ) {
         calcPosition();
         this->TargetAngleIndex = map(this->CurrentAngle,
                                     this->NormalizedAngleMinPosition, this->NormalizedAngleMaxPosition,
-                                    this->AngleIndexClose, this->AngleIndexOpen);
+                                    this->AngleIndexOpen, this->AngleIndexClose);
         (this->controlServo)();
 
+        if ( this->isLogValid ) {
+            outputLog(this);
+        }
         delay(PERIOD_CONTROL_IN_MILISEC);
     }
 }
@@ -282,21 +303,23 @@ void HACKberry::initLog() {
     Serial.begin(9600);
 }
 
-void HACKberry::outputLog() {
-    if ( this->isLogValid ) {
-        Serial.print("== LOG ==");
-        Serial.print("=== Sensor ===");
-        Serial.print("  "); Serial.print("Cur Sensor Val ="); Serial.print(this->SensorValue);
-        Serial.print("  "); Serial.print("Min Sensor Val ="); Serial.print(this->MinSensorValue);
-        Serial.print("  "); Serial.print("Max Sensor Val ="); Serial.print(this->MaxSensorValue);
-        Serial.print("=== Status ===");
-        Serial.print("  "); Serial.print("Current Ang ="); Serial.print(this->CurrentAngle);
-        Serial.print("  "); Serial.print("Cuurent Vel ="); Serial.print(this->CurrentAngularVelocity);
-        Serial.print("  "); Serial.print("Target Ang (Index)="); Serial.print(this->TargetAngleIndex);
-        Serial.print("  "); Serial.print("Target Ang (Middle)="); Serial.print(this->TargetAngleMiddle);
-        Serial.print("  "); Serial.print("Target Ang (Thumb)="); Serial.print(this->TargetAngleThumb);
-        Serial.print("  "); Serial.print("Flag Thumb Open="); Serial.print(this->isThumbOpen);
-        Serial.print("  "); Serial.print("Flag Other Lock="); Serial.print(this->isOtherLock);
+void outputLog(HACKberry* hackberry) {
+    if ( hackberry->isLogValid ) {
+        Serial.println("== LOG ==");
+        Serial.print("  "); Serial.print("Serial Number = "); Serial.println(hackberry->serialNum);
+        Serial.println("=== Sensor ===");
+        Serial.print("  "); Serial.print("Cur Sensor Val = "); Serial.println(hackberry->SensorValue);
+        Serial.print("  "); Serial.print("Min Sensor Val = "); Serial.println(hackberry->MinSensorValue);
+        Serial.print("  "); Serial.print("Max Sensor Val = "); Serial.println(hackberry->MaxSensorValue);
+        Serial.println("=== Status ===");
+        Serial.print("  "); Serial.print("Current Ang = "); Serial.println(hackberry->CurrentAngle);
+        Serial.print("  "); Serial.print("Cuurent Vel = "); Serial.println(hackberry->CurrentAngularVelocity);
+        Serial.print("  "); Serial.print("Target Ang (Index)= "); Serial.println(hackberry->TargetAngleIndex);
+        Serial.print("  "); Serial.print("Target Ang (Middle)= "); Serial.println(hackberry->TargetAngleOther);
+        Serial.print("  "); Serial.print("Target Ang (Thumb)= "); Serial.println(hackberry->TargetAngleThumb);
+        Serial.print("  "); Serial.print("Flag Thumb Open= "); Serial.println(hackberry->isThumbOpen);
+        Serial.print("  "); Serial.print("Flag Other Lock= "); Serial.println(hackberry->isOtherLock);
+        Serial.print("  "); Serial.print("Flag Sensor Rev= "); Serial.println(hackberry->isSensorReversed);
     } else {
     }
 }
