@@ -3,8 +3,11 @@
 #include "Wire.h"
 #include "HbI2C.h"
 
+extern char* HbSerialNum;
 extern int HbSensorVal;
-int BLEStateVal;
+extern int HbBatteryVal;
+extern ConnectionStatus BLEStateVal;
+extern HandState HandStateVal;
 
 // I2C Buffer
 uint8_t bufrx[I2C_BUFSIZE];
@@ -13,18 +16,20 @@ uint8_t buftx[I2C_BUFSIZE];
 // cmd and state
 int cmd; // if -1, received data is cmd;
 
-
 void requestEvent() {
     if (cmd == -1) {
         // if this section is excuted,
         // something go wrong
     } else {
         switch (cmd) {
+            case I2C_CMD_READ_SN:
+                HbI2C_transceiveSerialNumber(HbSerialNum);
+                break;
             case I2C_CMD_READ_STATE:
-                HbI2C_transceiveState(0);
+                HbI2C_transceiveState(HandStateVal);
                 break;
             case I2C_CMD_READ_BAT:
-                HbI2C_transceiveBattery(0);
+                HbI2C_transceiveBattery(HbBatteryVal);
                 break;
         }
         cmd = -1;
@@ -49,6 +54,10 @@ void receiveEvent() {
         }
         cmd = -1;
     }
+}
+
+void HbI2C_transceiveSerialNumber(char *sn) {
+    Wire.write(sn);
 }
 
 void HbI2C_transceiveState(uint8_t val) {

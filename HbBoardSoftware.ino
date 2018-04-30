@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <Servo.h>
-#include <MsTimer2.h>
 
 #include "HACKberry.h"
 #include "HbButton.h"
@@ -9,16 +8,23 @@
 // Objects
 HACKberry Hb;
 
+//Global
+char HbSerialNum[] = "Wireless Test";
+int HbSensorVal  = 0;
+int HbBatteryVal = 0;
+ConnectionStatus BLEStateVal = Disconnected;
+HandState HandStateVal = NotInitialized;
+
 void setup() {
 
     // Object initialization
-    Hb.setBoardType(Mk1Left);
-    Hb.setSerialNum("HACKberry");
-    Hb.setAngleIndex(   0, 180);
-    Hb.setAngleOther(   0, 180);
-    Hb.setAngleThumb(   0, 180);
+    Hb.setBoardType(Mk2RightBLE);
+    Hb.setSerialNum(HbSerialNum);
+    Hb.setAngleIndex( 15, 135);
+    Hb.setAngleOther(100,  95);
+    Hb.setAngleThumb(100, 175);
     Hb.setSpeedRange( -2, 0, 0, 4); //
-    Hb.setSensorThreshold( 20, 30, 50); //
+    Hb.setSensorThreshold(20, 30, 60); //
 
     // init
     Hb.init();
@@ -36,7 +42,7 @@ void setup() {
     delay(1000);
 
     while (1) {
-        
+
         if (Hb.ButtonCalib.read() == LOW) {
             Hb.calibration(3000);
             break;
@@ -47,9 +53,6 @@ void setup() {
         }
         delay(PERIOD_CONTROL_IN_MILISEC);
     }
-
-    //MsTimer2::set(PERIOD_CONTROL_IN_MILISEC, Control);
-    //MsTimer2::start();
 }
 
 void loop() {
