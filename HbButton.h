@@ -20,4 +20,6 @@ public:
     boolean readraw();
 };
 
+boolean isPinPort(int);
+
 #endif

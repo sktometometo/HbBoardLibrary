@@ -12,13 +12,13 @@ HbButton::HbButton(int pin)
 
 void HbButton::init()
 {
-    pinMode( this->pin, INPUT_PULLUP);
+    if ( isPinPort(pin) ) pinMode( this->pin, INPUT_PULLUP);
 }
 
 void HbButton::attach(int pin)
 {
     this->pin = pin;
-    pinMode( this->pin, INPUT_PULLUP);
+    if ( isPinPort(pin) ) pinMode( this->pin, INPUT_PULLUP);
 }
 
 boolean HbButton::read()
@@ -30,16 +30,26 @@ boolean HbButton::read()
         if ( this->readraw() == LOW ) count++;
         delayMicroseconds(time_delay);
     }
-    
+
     if (count == HBBUTTON_MAX_COUNT) return LOW;
     else return HIGH;
 }
 
 boolean HbButton::readraw()
 {
-    if ( digitalPinToPort(pin) == NOT_A_PIN ) {
+    if ( isPinPort(pin) ) {
         return analogRead(this->pin) > 512 ? HIGH : LOW;
     } else {
         return digitalRead(this->pin);
     }
+}
+
+boolean isPinPort(int pin)
+{
+#if defined(ARDUINO_AVR_NANO) // for mk2
+    return (pin >= 0) && (pin <= 19) ? true : false;
+#elif defined(ARDUINO_AVR_A_STAR_32U4) // for Size S and M.  leonard compatible?
+    return (pin >= 0) ? true : false;
+#endif
+    return true;
 }
