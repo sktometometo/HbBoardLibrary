@@ -5,7 +5,7 @@
 #include "HbI2C.h"
 #include "HbSensor.h"
 
-int HbSensorVal;
+extern int HbSensorVal;
 
 HbSensor::HbSensor()
 {
@@ -56,16 +56,18 @@ int HbSensor::read()
     if ( this->bus == None ||
         (this->bus == AnalogIn && this->pin == -1) ) return -1;
 
-    int i, sval;
     switch(bus)
     {
         case AnalogIn:
-            for (i=0; i<10; i++) {
+            int sval;
+            for (int i=0; i<10; i++) {
                 sval += analogRead(this->pin);
             }
             sval = sval/10;
             return sval;
         case I2C:
             return HbSensorVal;
+        default:
+            return 0;
     }
 }

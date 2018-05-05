@@ -3,7 +3,7 @@
 #include "Wire.h"
 #include "HbI2C.h"
 
-extern char* HbSerialNum;
+extern char HbSerialNum[];
 extern int HbSensorVal;
 extern int HbBatteryVal;
 extern ConnectionStatus BLEStateVal;

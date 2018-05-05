@@ -4,6 +4,7 @@
 #include "HACKberry.h"
 #include "HbButton.h"
 #include "HbSensor.h"
+#include "HbI2C.h"
 
 // Objects
 HACKberry Hb;
