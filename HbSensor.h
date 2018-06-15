@@ -6,7 +6,9 @@
 typedef enum {
     None,
     AnalogIn,
-    I2C
+    I2C,
+    SerialBus,
+    BLE
 } SensorBusType;
 
 class HbSensor

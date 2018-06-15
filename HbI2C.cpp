@@ -1,6 +1,7 @@
 #include <Arduino.h>
 
 #include "Wire.h"
+#include "HACKberry.h"
 #include "HbI2C.h"
 
 extern char HbSerialNum[];
@@ -8,6 +9,7 @@ extern int HbSensorVal;
 extern int HbBatteryVal;
 extern ConnectionStatus BLEStateVal;
 extern HandState HandStateVal;
+extern HACKberry Hb;
 
 // I2C Buffer
 uint8_t bufrx[I2C_BUFSIZE];
@@ -17,9 +19,13 @@ uint8_t buftx[I2C_BUFSIZE];
 int cmd; // if -1, received data is cmd;
 
 void requestEvent() {
+    if (Hb.isLogValid) {
+        Serial.println(" I2C Request");
+    }
     if (cmd == -1) {
         // if this section is excuted,
         // something go wrong
+        Serial.println(" I2C error");
     } else {
         switch (cmd) {
             case I2C_CMD_READ_SN:
@@ -37,6 +43,9 @@ void requestEvent() {
 }
 
 void receiveEvent() {
+    if (Hb.isLogValid) {
+        Serial.println(" I2C data received.");
+    }
     for (int i=0; i<I2C_BUFSIZE || Wire.available(); i++) {
         bufrx[i] = Wire.read();
     }
@@ -62,14 +71,14 @@ void HbI2C_transceiveSerialNumber(char *sn) {
 
 void HbI2C_transceiveState(uint8_t val) {
     // TBD
-    // TODO: bufdataを1バイトでつくる
+    // TODO: bufdata繧�1繝舌う繝医〒縺､縺上ｋ
     buftx[0] = val;
     Wire.write(buftx, 1);
 }
 
 void HbI2C_transceiveBattery(uint16_t val) {
     // TBD
-    // TODO: bufdataを2バイトでつくる
+    // TODO: bufdata繧�2繝舌う繝医〒縺､縺上ｋ
     buftx[0] = val >> 8;
     buftx[1] = val;
     Wire.write(buftx, 2);
@@ -83,3 +92,6 @@ void HbI2C_receiveBLEState(int val) {
     // TBD
     BLEStateVal = val;
 }
+
+
+

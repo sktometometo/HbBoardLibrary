@@ -1,7 +1,7 @@
 #ifndef __HACKBERRY_H__
 #define __HACKBERRY_H__
 
-#define PERIOD_CONTROL_IN_MILISEC 10
+#define PERIOD_CONTROL_IN_MILISEC 50
 
 #include <Arduino.h>
 #include <Servo.h>
@@ -19,7 +19,8 @@ typedef enum {
     SizeSLeft,
     SizeMRight,
     SizeMLeft,
-    Mk2RightBLE
+    Mk2RightBLE,
+    Mk2LeftBLE
 } BoardType;
 
 class HACKberry {
@@ -44,8 +45,11 @@ public:
     // TBI: init them in init();
     boolean isThumbOpen=true;
     boolean isOtherLock=false;
-    boolean isLogValid=false;
     boolean isSensorReversed=false;
+
+    // Log
+    boolean isLogValid=false;
+    int modeLog = 0;
 
     // status variables
     int ControlInput;
@@ -120,12 +124,6 @@ public:
     void setSpeedRange(int , int , int , int );
     void setSensorThreshold(int , int , int);
 
-    // Not In Use
-    void setCalibCallBack(void (*)(void*));
-    void setExtraCallBack(void (*)(void*));
-    void setThumbCallBack(void (*)(void*));
-    void setOtherCallBack(void (*)(void*));
-
     void init();
     void readSensor();
     void calcControlInput();
@@ -133,10 +131,30 @@ public:
     void controlServo();
     void calibration(unsigned long);
 
-    void initLog();
+    void initLog(int);
 
 };
 
 void outputLog(HACKberry *);
+
+/*
+ *
+ * ---------- Type Declarations ----------
+ *
+ */
+typedef enum
+{
+    Disconnected = 0,
+    Connected    = 1,
+    Connecting   = 2,
+    Unknown      = 3
+} ConnectionStatus;
+
+typedef enum {
+    NotInitialized = 0,
+    Calibrating    = 1,
+    WorkingWell    = 2,
+    SomethingWrong = 3
+} HandState;
 
 #endif

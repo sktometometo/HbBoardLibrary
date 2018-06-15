@@ -37,7 +37,7 @@ boolean HbButton::read()
 
 boolean HbButton::readraw()
 {
-    if ( isPinPort(pin) ) {
+    if ( !isPinPort(pin) ) {
         return analogRead(this->pin) > 512 ? HIGH : LOW;
     } else {
         return digitalRead(this->pin);
@@ -47,9 +47,10 @@ boolean HbButton::readraw()
 boolean isPinPort(int pin)
 {
 #if defined(ARDUINO_AVR_NANO) // for mk2
-    return (pin >= 0) && (pin <= 19) ? true : false;
+    return (pin != A6) && (pin != A7) ? true : false;
 #elif defined(ARDUINO_AVR_A_STAR_32U4) // for Size S and M.  leonard compatible?
     return (pin >= 0) ? true : false;
 #endif
     return true;
 }
+

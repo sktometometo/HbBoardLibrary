@@ -9,7 +9,7 @@
 // Objects
 HACKberry Hb;
 
-//Global
+// Global
 char HbSerialNum[] = "Wireless Test";
 int HbSensorVal  = 0;
 int HbBatteryVal = 0;
@@ -19,7 +19,7 @@ HandState HandStateVal = NotInitialized;
 void setup() {
 
     // Object initialization
-    Hb.setBoardType(Mk2RightBLE);
+    Hb.setBoardType(Mk2Left);
     Hb.setSerialNum(HbSerialNum);
     Hb.setAngleIndex( 15, 135);
     Hb.setAngleOther(100,  95);
@@ -28,8 +28,9 @@ void setup() {
     Hb.setSensorThreshold(20, 30, 60); //
 
     // init
+    //Hb.initLog(1);
     Hb.init();
-    Hb.initLog();
+    // Hb.initLog(1);
 
     delay(100);
 
@@ -45,14 +46,21 @@ void setup() {
     while (1) {
 
         if (Hb.ButtonCalib.read() == LOW) {
-            Hb.calibration(3000);
+            if (Hb.isLogValid) {
+                Serial.println("calibration started");
+            }
+            Hb.calibration(10000);
             break;
         }
-        if (Hb.isLogValid) {
+        if ( Hb.isLogValid ) {
             Serial.println("wating for calibration....");
             outputLog(&Hb);
         }
         delay(PERIOD_CONTROL_IN_MILISEC);
+    }
+
+    if ( Hb.isLogValid ) {
+        Serial.println("control process started");
     }
 }
 
@@ -65,11 +73,12 @@ void loop() {
         while (Hb.ButtonCalib.read() == LOW) delay(1);
     }
 
+    /*
     if (Hb.ButtonExtra.read() == LOW) {
         // do something here
         Hb.isSensorReversed = !Hb.isSensorReversed;
         while (Hb.ButtonExtra.read() == LOW) delay(1);
-    }
+    }*/
 
     if (Hb.ButtonThumb.read() == LOW) {
         Hb.isThumbOpen = !Hb.isThumbOpen;
@@ -109,3 +118,4 @@ void loop() {
     delay(PERIOD_CONTROL_IN_MILISEC);
     outputLog(&Hb);
 }
+
